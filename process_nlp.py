@@ -4,7 +4,7 @@ import nltk
 import pymorphy2
 
 
-db_fileName = "./data_cl.json"
+db_fileName = "./data_soc.json"
 
 def add_data(text):
     import pathlib
@@ -48,7 +48,6 @@ def clear_db():
 
 
 def data_proc(filename, save_filename, threshold=0):
-    # with open("./uploads/"+filename+".json", "r", encoding="UTF8") as file:
     with open(filename, "r", encoding="UTF8") as file:
         content = file.read()
     messages = json.loads(content)
@@ -70,12 +69,8 @@ def data_proc(filename, save_filename, threshold=0):
         line["reply_message_id"] = m["reply_message_id"]
         proc_messages.append(line)
     jsonstring = json.dumps(proc_messages, ensure_ascii=False)
-    # print(jsonstring)
-    # name = filename.split(".")[0]
-    # with open(f"./uploads/{name}_proc.json", "w", encoding="UTF8") as file:
     with open(save_filename, "w", encoding="UTF8") as file:
         file.write(jsonstring)
-    # return proc_messages
 
 def load_data_proc(filename):
     with open(filename, "r", encoding="UTF8") as file:
@@ -144,29 +139,6 @@ def remove_all(data):
     return data
 
 
-def get_RAKE(text):
-    from rake_nltk import Metric, Rake
-    r = Rake(language="russian")
-    r.extract_keywords_from_text(text)
-    numOfKeywords = 20
-    keywords = r.get_ranked_phrases()[:numOfKeywords]
-    return keywords
-
-
-def get_YAKE(text):
-    import yake
-    language = "ru"
-    max_ngram_size = 3
-    deduplication_threshold = 0.9
-    numOfKeywords = 20
-    custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, dedupLim=deduplication_threshold, top=numOfKeywords, features=None)
-    keywords = custom_kw_extractor.extract_keywords(text)
-    l=[]
-    for item in keywords:
-        l.append(list(item))
-    return l
-
-
 def get_KeyBERT(text):
     from keybert import KeyBERT
     kw_model = KeyBERT()
@@ -180,42 +152,20 @@ def get_KeyBERT(text):
     return l
 
 
-def set_scores(l):
-    count = len(l)
-    new_l=[]
-    import random
-    random.uniform(0, 1)
-    for item in l:
-        new_l.append([item, random.uniform(0, 1)])
-    return new_l
-
 def get_pattern(text):
     line = {}
     line['text'] = text.strip()
     line['remove_all'] = remove_all(text).strip()
-    line['normal_form'] = get_normal_form(remove_all(text).strip())
-    line['RAKE'] = set_scores(get_RAKE(text))
-    line['YAKE'] = get_YAKE(text)
-    line['BERT'] = get_KeyBERT(text)
+    line['KEYWORDS'] = get_KeyBERT(text)
     return line
 
 
-def add_print_text(data):
-    RAKE_text =[]
-    for item in data['RAKE']:
-        RAKE_text.append(item[0])
-    YAKE_text =[]
-    for item in data['YAKE']:
-        YAKE_text.append(item[0])    
+def add_print_text(data):   
     BERT_text =[]
-    for item in data['BERT']:
+    for item in data['KEYWORDS']:
         BERT_text.append(item[0])
-    
     str1 = str(f"Исходный текст: {data['text']} \n\n"
-            f" Нормальная форма: {data['normal_form']} \n\n"
-            f" RAKE: {RAKE_text} \n\n"
-            f" YAKE: {YAKE_text} \n\n"
-            f" BERT: {BERT_text} \n\n")
+            f" KEYWORDS: {BERT_text} \n\n")
     data['print_text'] = str1
     # print(str1)
     return data
@@ -289,37 +239,17 @@ def find_cl(filename):
     messages = load_data_proc(filename)
     data_cl = load_db()
     cl_messages = []
-    # def calc_intersection_all(text1, l2):
-    #     max_counts = 0
-    #     for item in l2:
-    #         current_counts = calc_intersection_one(text1, item['normal_form'])
-    #         if current_counts > max_counts:
-    #             max_counts = current_counts
-    #     return max_counts
-    # counts = []
     find_data = []
     for m in messages:
         item = m
         num = 0
-        item["RAKE_COUNT"] = 0
-        item["RAKE_NUM"] = 0
-        item["YAKE_COUNT"] = 0
-        item["YAKE_NUM"] = 0
-        item["BERT_COUNT"] = 0
-        item["BERT_NUM"] = 0
+        item["KW_COUNT"] = 0
+        item["KW_NUM"] = 0
         for cl in data_cl:
-            intersect_RAKE = calc_intersection_list(m['RAKE'], cl['RAKE'])
-            if intersect_RAKE>item["RAKE_COUNT"]:
-                item["RAKE_COUNT"] = intersect_RAKE
-                item["RAKE_NUM"] = num
-            intersect_YAKE = calc_intersection_list(m['YAKE'], cl['YAKE'])
-            if intersect_YAKE>item["YAKE_COUNT"]:
-                item["YAKE_COUNT"] = intersect_YAKE
-                item["YAKE_NUM"] = num
-            intersect_BERT = calc_intersection_list(m['BERT'], cl['BERT'])
-            if intersect_BERT>item["BERT_COUNT"]:
-                item["BERT_COUNT"] = intersect_BERT
-                item["BERT_NUM"] = num
+            intersect_BERT = calc_intersection_list(m['KEYWORDS'], cl['KEYWORDS'])
+            if intersect_BERT>item["KW_COUNT"]:
+                item["KW_COUNT"] = intersect_BERT
+                item["KW_NUM"] = num
             num += 1
         find_data.append(item)
     jsonstring = json.dumps(find_data, ensure_ascii=False)
@@ -327,38 +257,16 @@ def find_cl(filename):
         file.write(jsonstring)
 
 
-def find_type(filename, type='RAKE'):
+def find_type(filename):
     messages = load_data_proc(filename)
     find_data = []
-    RAKE_set=set() 
-    YAKE_set=set() 
     BERT_set=set() 
-    for m in messages:
-        RAKE_set.add(m['RAKE_COUNT'])
-        YAKE_set.add(m['YAKE_COUNT'])
-        BERT_set.add(m['BERT_COUNT'])
-    RAKE_s = max(RAKE_set)
-    YAKE_s = max(YAKE_set)
     BERT_s = max(BERT_set)
-    # RAKE_set=sorted(RAKE_set, reverse=True)
-    # YAKE_set=sorted(YAKE_set, reverse=True)
-    # BERT_set=sorted(BERT_set, reverse=True)
     counts=3
-    if type == 'RAKE':
-        for m in messages:
-            if m['RAKE_COUNT'] >= RAKE_s-counts:
-                m = add_print_text(m)
-                find_data.append(m)
-    if type == 'YAKE':
-        for m in messages:
-            if m['YAKE_COUNT'] >= YAKE_s-counts:
-                m = add_print_text(m)
-                find_data.append(m)                    
-    if type == 'BERT':
-        for m in messages:
-            if m['BERT_COUNT'] >= BERT_s-counts:
-                m = add_print_text(m)
-                find_data.append(m)                     
+    for m in messages:
+        if m['KW_COUNT'] >= BERT_s-counts:
+            m = add_print_text(m)
+            find_data.append(m)                     
     jsonstring = json.dumps(find_data, ensure_ascii=False)
     with open("./find_d.json", "w", encoding="UTF8") as file:
         file.write(jsonstring)
