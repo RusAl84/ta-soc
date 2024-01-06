@@ -257,7 +257,7 @@ def find_cl(filename):
         file.write(jsonstring)
 
 
-def find_type(filename):
+def find_soc(filename):
     messages = load_data_proc(filename)
     find_data = []
     BERT_set=set() 
@@ -303,5 +303,5 @@ if __name__ == '__main__':
     
     data_proc(filename, save_filename, 32)
     find_cl(save_filename)
-    find_type("./find_data.json", 'RAKE')
+    find_soc("./find_data.json")
     
