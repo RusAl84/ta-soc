@@ -291,17 +291,24 @@ def convertJsonMessages2text(filename):
 
 if __name__ == '__main__':
     # nltk_download()
-    s1 = """
-    Дарим 1000 бонусов за 1-ю авторизацию в мобильном приложении до 22.03.2023. Используйте бонусы на онлайн покупки. Clck.ru/33gyhM
-    """
-    add_data(s1)
+    # s1 = """
+    # Завтра в "Папа Джонс" самый черный пятничный праздник!🖤
+    # Мы знаем, что ты так же обожаешь скидки, поэтому держи подарок от нас - 100% начисления Black CashBack за все заказы 24.11.2023. 
+    # Успей воспользоваться Black CashBack, потому что он действует всего 3 дня!
+
+    # Такая возможность выпадает раз в году – съесть пиццу и получить такой огромный Black CashBack!
+
+    # Время тикает!
+
+    # """
+    # add_data(s1)
     # t = get_pattern(data)
     # print(t)
 
-    # filename="d:/ml/chat/andromedica1.json"
-    # save_filename="./data_proc.json"
+    filename="d:/ml/chat/andromedica1.json"
+    save_filename="./data_proc.json"
     
-    # data_proc(filename, save_filename, 32)
-    # find_cl(save_filename)
-    # find_soc("./find_data.json")
+    data_proc(filename, save_filename, 32)
+    find_cl(save_filename)
+    find_soc("./find_data.json")
     
