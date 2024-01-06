@@ -238,7 +238,6 @@ def calc_score(data1, data2):
 def find_cl(filename):
     messages = load_data_proc(filename)
     data_cl = load_db()
-    cl_messages = []
     find_data = []
     for m in messages:
         item = m
@@ -257,12 +256,13 @@ def find_cl(filename):
         file.write(jsonstring)
 
 
-def find_soc(filename):
+def find_soc(filename, counts=3):
     messages = load_data_proc(filename)
     find_data = []
-    BERT_set=set() 
+    BERT_set=set()
+    for m in messages:
+        BERT_set.add(m['KW_COUNT'])
     BERT_s = max(BERT_set)
-    counts=3
     for m in messages:
         if m['KW_COUNT'] >= BERT_s-counts:
             m = add_print_text(m)
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
     
-    data_proc(filename, save_filename, 32)
+    # data_proc(filename, save_filename, 32)
     find_cl(save_filename)
-    find_soc("./find_data.json")
+    find_soc("./find_data.json", 1)
     
