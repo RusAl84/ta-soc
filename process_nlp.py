@@ -263,8 +263,11 @@ def find_soc(filename, counts=3):
     for m in messages:
         BERT_set.add(m['KW_COUNT'])
     BERT_s = max(BERT_set)
+    dif = BERT_s-counts
+    if dif < 1:
+        dif = 1
     for m in messages:
-        if m['KW_COUNT'] >= BERT_s-counts:
+        if m['KW_COUNT'] >= dif:
             m = add_print_text(m)
             find_data.append(m)                     
     jsonstring = json.dumps(find_data, ensure_ascii=False)
@@ -310,5 +313,5 @@ if __name__ == '__main__':
     
     # data_proc(filename, save_filename, 32)
     find_cl(save_filename)
-    find_soc("./find_data.json", 1)
+    find_soc("./find_data.json", 4)
     

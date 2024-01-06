@@ -61,12 +61,12 @@ def findae():
     msg = request.json
     print(msg)
     filename = msg['filename']
-    ttype=msg['type']
+    counts=msg['counts']
     # filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
     # data_proc(filename, save_filename, 32)
     # find_cl(save_filename)
-    data = process_nlp.find_type("./find_data.json", ttype)
+    data = process_nlp.find_soc("./find_data.json", counts)
     print(data)
     return data
 
