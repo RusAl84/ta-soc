@@ -291,17 +291,17 @@ def convertJsonMessages2text(filename):
 
 if __name__ == '__main__':
     # nltk_download()
-    #s1 = """
-    # Дарим 1000 бонусов за 1-ю авторизацию в мобильном приложении до 22.03.2023. Используйте бонусы на онлайн покупки. Clck.ru/33gyhM
-    #"""
-    #add_data(s1)
+    s1 = """
+    Дарим 1000 бонусов за 1-ю авторизацию в мобильном приложении до 22.03.2023. Используйте бонусы на онлайн покупки. Clck.ru/33gyhM
+    """
+    add_data(s1)
     # t = get_pattern(data)
     # print(t)
 
-    filename="d:/ml/chat/andromedica1.json"
-    save_filename="./data_proc.json"
+    # filename="d:/ml/chat/andromedica1.json"
+    # save_filename="./data_proc.json"
     
-    data_proc(filename, save_filename, 32)
-    find_cl(save_filename)
-    find_soc("./find_data.json")
+    # data_proc(filename, save_filename, 32)
+    # find_cl(save_filename)
+    # find_soc("./find_data.json")
     
